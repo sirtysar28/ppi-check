@@ -1,0 +1,26 @@
+{
+    "name": "PPI Check — Audit & Surveilans PPI",
+    "short_name": "PPI Check",
+    "description": "Aplikasi Audit & Surveilans Pencegahan dan Pengendalian Infeksi",
+    "lang": "id",
+    "start_url": "/dashboard",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "theme_color": "#0a5c4d",
+    "background_color": "#eef5f3",
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
