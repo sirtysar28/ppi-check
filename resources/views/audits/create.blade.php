@@ -94,17 +94,14 @@
 
                         @if($category->code === 'apd')
                             <div class="col-12 col-md-6">
-                                <label class="form-label small fw-semibold">Jenis Tindakan</label>
-                                <input type="text" name="action_type" class="form-control" placeholder="cth: Pemasangan infus, Perawatan luka" value="{{ old('action_type') }}">
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label small fw-semibold">Jenis APD</label>
-                                <select name="apd_type_id" class="form-select">
-                                    <option value="">-- Pilih Jenis APD --</option>
-                                    @foreach($apdTypes as $apd)
-                                        <option value="{{ $apd->id }}" {{ (string)old('apd_type_id') === (string)$apd->id ? 'selected' : '' }}>{{ $apd->name }}</option>
+                                <label class="form-label small fw-semibold">Tindakan yang Diobservasi <span class="text-danger">*</span></label>
+                                <select name="action_type" class="form-select" required>
+                                    <option value="">-- Pilih Tindakan --</option>
+                                    @foreach($apdActions as $action)
+                                        <option value="{{ $action->name }}" {{ old('action_type') === $action->name ? 'selected' : '' }}>{{ $action->name }}</option>
                                     @endforeach
                                 </select>
+                                <div class="form-text">Pilih tindakan yang sedang diobservasi, lalu nilai penggunaan setiap jenis APD pada checklist di bawah.</div>
                             </div>
                         @endif
 
@@ -138,6 +135,14 @@
                         <span class="text-danger"><i class="bi bi-x-circle-fill"></i> Tidak = Tidak Sesuai (membuka form temuan)</span> ·
                         <span class="text-secondary"><i class="bi bi-dash-circle-fill"></i> N/A = Tidak Dinilai</span>
                     </div>
+
+                    @if($category->code === 'apd')
+                        <div class="alert alert-light border small py-2 mb-3" style="border-radius:.8rem">
+                            <b>Catatan:</b> Setiap tindakan dinilai terhadap penggunaan jenis APD berikut:
+                            Sarung Tangan, Masker, Goggle, Apron, Tutup Kepala, dan Sepatu Boot.
+                            Pilih <span class="text-success fw-semibold">Ya</span> bila APD digunakan sesuai, <span class="text-danger fw-semibold">Tidak</span> bila tidak digunakan.
+                        </div>
+                    @endif
 
                     @foreach($category->activeQuestions as $q)
                         <div class="checklist-item" :class="answers[{{ $q->id }}] === 'tidak' && 'has-tidak'">

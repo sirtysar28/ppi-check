@@ -286,6 +286,16 @@ body {
     color: #fff;
 }
 
+.btn-outline-brand {
+    --bs-btn-color: var(--ppi-teal);
+    --bs-btn-border-color: var(--ppi-teal);
+    --bs-btn-hover-bg: var(--ppi-teal);
+    --bs-btn-hover-border-color: var(--ppi-teal);
+    --bs-btn-active-bg: var(--ppi-teal-dark);
+    --bs-btn-active-border-color: var(--ppi-teal-dark);
+    color: var(--ppi-teal);
+}
+
 /* ---------- Login ---------- */
 .login-page {
     min-height: 100dvh;
@@ -925,4 +935,175 @@ body {
     border: 2px solid #fff;
     box-shadow: 0 0 0 2px #d7e6e2;
     background: #adb5bd;
+}
+
+/* ==============================
+   Notifikasi (topbar)
+   ============================== */
+.nav-notif-btn {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid #e3ebe9;
+    background: #fff;
+    color: #48645d;
+    font-size: 1.05rem;
+    line-height: 1;
+    transition: all .15s ease;
+}
+
+.nav-notif-btn:hover {
+    background: var(--ppi-teal-light);
+    color: var(--ppi-teal-dark);
+}
+
+.nav-notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #e5484d;
+    color: #fff;
+    font-size: .6rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+}
+
+.nav-notif-menu {
+    width: min(360px, calc(100vw - 2rem));
+    border-radius: 1rem;
+    border: 1px solid #e3ebe9;
+    padding: 0;
+    overflow: hidden;
+}
+
+.nav-notif-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .7rem 1rem;
+    border-bottom: 1px solid #edf2f0;
+    font-size: .88rem;
+}
+
+.nav-notif-summary {
+    display: grid;
+    gap: .35rem;
+    padding: .6rem .8rem;
+    background: #f7fbfa;
+    border-bottom: 1px solid #edf2f0;
+}
+
+.nav-notif-stat {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: .45rem .6rem;
+    border-radius: .7rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background .15s ease;
+}
+
+.nav-notif-stat:hover { background: #eef6f4; }
+.nav-notif-stat i { font-size: 1.05rem; }
+.nav-notif-stat .fw-bold { font-size: .92rem; line-height: 1.1; }
+.nav-notif-stat small { color: #6c8880; font-size: .72rem; }
+
+.nav-notif-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.nav-notif-item {
+    display: block;
+    padding: .65rem 1rem;
+    border-bottom: 1px solid #f1f5f4;
+    text-decoration: none;
+    color: inherit;
+    transition: background .15s ease;
+}
+
+.nav-notif-item:hover { background: #f7fbfa; }
+
+.nav-notif-empty {
+    padding: 1.6rem 1rem;
+    text-align: center;
+    color: #93aca5;
+}
+
+.nav-notif-empty i { font-size: 1.6rem; display: block; margin-bottom: .35rem; }
+.nav-notif-empty div { font-size: .78rem; }
+
+.nav-notif-footer {
+    display: block;
+    padding: .6rem;
+    text-align: center;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--ppi-teal);
+    text-decoration: none;
+    background: #f7fbfa;
+}
+
+.nav-notif-footer:hover { background: var(--ppi-teal-light); }
+
+/* ==============================
+   Footer — Inter, kecil & clean
+   ============================== */
+.app-footer {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: .68rem;
+    font-weight: 500;
+    letter-spacing: .015em;
+    color: #8aa39b;
+}
+
+.app-footer .footer-left,
+.app-footer .footer-right {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    flex-wrap: wrap;
+}
+
+.app-footer .footer-sep {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #c2d4cf;
+    display: inline-block;
+    flex: none;
+}
+
+.app-footer a {
+    color: var(--ppi-teal);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.app-footer a:hover { text-decoration: underline; }
+
+@media (max-width: 575.98px) {
+    .app-footer { justify-content: center; text-align: center; }
+}
+
+/* Pagination ringkas di dalam kartu (cth. Kepatuhan per Unit) */
+.card .pagination {
+    --bs-pagination-padding-x: .55rem;
+    --bs-pagination-padding-y: .2rem;
+    --bs-pagination-font-size: .76rem;
+    --bs-pagination-border-radius: .5rem;
+    margin-bottom: 0;
+    flex-wrap: wrap;
 }

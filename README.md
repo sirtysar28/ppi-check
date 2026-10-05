@@ -9,13 +9,15 @@
 | Modul | Deskripsi |
 | --- | --- |
 | 📊 **Dashboard** | Ringkasan skor kepatuhan per unit & per kategori audit, tren capaian, dan grafik visual (Chart.js), termasuk detail per unit |
-| 🧼 **Audit PPI** | Pelaksanaan audit: **Cuci Tangan (Hand Hygiene)**, **APD (Alat Pelindung Diri)**, dan **Pemilahan Sampah** — lengkap dengan perhitungan skor otomatis & ekspor PDF per audit |
+| 🧼 **Audit PPI** | Pelaksanaan audit: **Cuci Tangan (5 Momen WHO)**, **APD** (pilih 1 dari 19 tindakan, nilai 6 jenis APD: Sarung Tangan, Masker, Goggle, Apron, Tutup Kepala, Sepatu Boot), dan **Pemilahan Sampah** — lengkap dengan perhitungan skor otomatis & ekspor PDF per audit |
+| 💉 **Monitoring Limbah Benda Tajam** | Lembar monitoring penanganan limbah benda tajam (8 pernyataan, Ya/Tidak) dengan persentase otomatis, riwayat, cetak & PDF |
 | 🔍 **Surveilans Temuan** | Monitoring seluruh temuan (finding) hasil audit beserta statusnya |
 | 📝 **Tindak Lanjut** | Unit/petugas mengirimkan tindak lanjut atas temuan, auditor/admin memverifikasi |
+| 🔔 **Notifikasi** | Ikon lonceng di header: temuan menunggu tindak lanjut, lewat jatuh tempo, dan tindak lanjut menunggu verifikasi |
 | 📄 **Laporan** | Rekapitulasi laporan audit dengan ekspor **Excel** dan **PDF** |
-| 🗂️ **Master Data** | Kelola Unit, Profesi, Jenis APD, Jenis Limbah, dan Instrumen Audit (kategori & butir pertanyaan) |
+| 🗂️ **Master Data** | Kelola Unit/Ruangan (44 ruangan), Profesi, Jenis APD, Tindakan APD (19 item), Jenis Limbah, dan Instrumen Audit (kategori & butir pertanyaan) |
 | 👥 **Manajemen User** | Pengelolaan pengguna & penetapan peran (khusus Super Admin) |
-| ⚙️ **Pengaturan** | Konfigurasi aplikasi (identitas rumah sakit, dll.) |
+| ⚙️ **Pengaturan** | Tab **Umum** (identitas RS & ambang batas predikat), **SMTP Email** (konfigurasi + email percobaan), **Logo Aplikasi** (ganti logo), dan **Ganti Password** |
 | 👤 **Profil** | Pembaruan data profil & kata sandi pengguna |
 | 🔐 **Keamanan** | Login dengan **captcha SVG**, rate-limiting percobaan login, middleware peran & status aktif user, activity log |
 | 📱 **PWA Ready** | Service worker, manifest & halaman offline — dapat dipasang seperti aplikasi mobile |

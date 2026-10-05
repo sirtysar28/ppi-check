@@ -6,10 +6,12 @@ use App\Http\Controllers\AuditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FindingController;
 use App\Http\Controllers\FollowUpController;
+use App\Http\Controllers\MonitoringLimbahTajamController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\Master\ApdActionController;
 use App\Http\Controllers\Master\ApdTypeController;
 use App\Http\Controllers\Master\InstrumentController;
 use App\Http\Controllers\Master\ProfessionController;
@@ -62,6 +64,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/follow-ups', [FollowUpController::class, 'index'])->name('followups.index');
     Route::post('/findings/{finding}/follow-up', [FollowUpController::class, 'store'])->name('followups.store');
 
+    // Lembar Monitoring Penanganan Limbah Benda Tajam
+    Route::get('/monitoring-limbah-tajam', [MonitoringLimbahTajamController::class, 'create'])->name('monitoring-limbah-tajam.create');
+    Route::post('/monitoring-limbah-tajam', [MonitoringLimbahTajamController::class, 'store'])->name('monitoring-limbah-tajam.store');
+    Route::get('/monitoring-limbah-tajam/riwayat', [MonitoringLimbahTajamController::class, 'index'])->name('monitoring-limbah-tajam.index');
+    Route::get('/monitoring-limbah-tajam/{monitoring}', [MonitoringLimbahTajamController::class, 'show'])->whereNumber('monitoring')->name('monitoring-limbah-tajam.show');
+    Route::get('/monitoring-limbah-tajam/{monitoring}/pdf', [MonitoringLimbahTajamController::class, 'pdf'])->whereNumber('monitoring')->name('monitoring-limbah-tajam.pdf');
+    Route::delete('/monitoring-limbah-tajam/{monitoring}', [MonitoringLimbahTajamController::class, 'destroy'])->whereNumber('monitoring')->name('monitoring-limbah-tajam.destroy');
+
     // Verifikasi (Auditor / Admin)
     Route::post('/findings/{finding}/verify', [VerificationController::class, 'store'])
         ->middleware('can:verify-followup')->name('verifications.store');
@@ -80,6 +90,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('units', UnitController::class)->except(['create', 'edit', 'show']);
         Route::resource('professions', ProfessionController::class)->except(['create', 'edit', 'show']);
         Route::resource('apd-types', ApdTypeController::class)->except(['create', 'edit', 'show']);
+        Route::resource('apd-actions', ApdActionController::class)->except(['create', 'edit', 'show']);
         Route::resource('waste-types', WasteTypeController::class)->except(['create', 'edit', 'show']);
 
         // Instrumen Audit (kategori + pertanyaan)
@@ -104,7 +115,14 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:manage-masters')->group(function () {
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::put('/settings/smtp', [SettingController::class, 'updateSmtp'])->name('settings.smtp.update');
+        Route::post('/settings/smtp/test', [SettingController::class, 'testSmtp'])->name('settings.smtp.test');
+        Route::post('/settings/logo', [SettingController::class, 'updateLogo'])->name('settings.logo.update');
+        Route::delete('/settings/logo', [SettingController::class, 'resetLogo'])->name('settings.logo.reset');
     });
+
+    // Ganti password (semua role)
+    Route::put('/settings/password', [SettingController::class, 'updatePassword'])->name('settings.password.update');
 });
 
 // Offline page (PWA)

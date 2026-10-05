@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ApdAction;
 use App\Models\ApdType;
 use App\Models\AuditCategory;
 use App\Models\AuditQuestion;
@@ -10,6 +11,7 @@ use App\Models\Setting;
 use App\Models\Unit;
 use App\Models\User;
 use App\Models\WasteType;
+use App\Support\MasterData;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,21 +19,12 @@ class MasterSeeder extends Seeder
 {
     public function run(): void
     {
-        // ==== Units ====
-        $units = [
-            ['code' => 'ICU', 'name' => 'Intensive Care Unit (ICU)', 'head_name' => 'Ns. Dewi Lestari'],
-            ['code' => 'IGD', 'name' => 'Instalasi Gawat Darurat (IGD)', 'head_name' => 'Ns. Budi Santoso'],
-            ['code' => 'RIN', 'name' => 'Rawat Inap (R1)', 'head_name' => 'Ns. Sari Wulandari'],
-            ['code' => 'POL', 'name' => 'Poliklinik Umum', 'head_name' => 'Ns. Andi Pratama'],
-            ['code' => 'OK', 'name' => 'Kamar Operasi (OK)', 'head_name' => 'Ns. Rina Marlina'],
-            ['code' => 'LAB', 'name' => 'Laboratorium', 'head_name' => 'An. Joko Susilo'],
-            ['code' => 'FRM', 'name' => 'Farmasi', 'head_name' => 'Apt. Maya Sari'],
-            ['code' => 'HDL', 'name' => 'Hemodialisa', 'head_name' => 'Ns. Eko Purnomo'],
-            ['code' => 'PRT', 'name' => 'Perinatologi / NICU', 'head_name' => 'Ns. Fitri Handayani'],
-            ['code' => 'CSSD', 'name' => 'CSSD (Sterilisasi)', 'head_name' => 'Ns. Hendra Wijaya'],
-        ];
-        foreach ($units as $u) {
-            Unit::updateOrCreate(['code' => $u['code']], $u);
+        // ==== Units (44 ruangan sesuai dokumen Update 5 Okt 2026) ====
+        foreach (MasterData::UNITS as $name) {
+            Unit::updateOrCreate(
+                ['code' => MasterData::unitCode($name)],
+                ['name' => $name, 'is_active' => true]
+            );
         }
 
         // ==== Professions ====
@@ -39,18 +32,20 @@ class MasterSeeder extends Seeder
             Profession::updateOrCreate(['name' => $p]);
         }
 
-        // ==== APD Types ====
-        $apd = [
-            ['name' => 'Masker', 'description' => 'Masker bedah / N95'],
-            ['name' => 'Sarung Tangan', 'description' => 'Sarung tangan sekali pakai'],
-            ['name' => 'Gown', 'description' => 'Gaun pelindung'],
-            ['name' => 'Apron', 'description' => 'Celemek plastik'],
-            ['name' => 'Face Shield', 'description' => 'Pelindung wajah'],
-            ['name' => 'Goggle', 'description' => 'Kacamata pelindung'],
-            ['name' => 'Sepatu Pelindung', 'description' => 'Sepatu boot / cover sepatu'],
-        ];
-        foreach ($apd as $a) {
-            ApdType::updateOrCreate(['name' => $a['name']], $a);
+        // ==== APD Types (jenis APD yang dinilai — sesuai Word 5 Okt 2026) ====
+        foreach (MasterData::APD_TYPES as $name) {
+            ApdType::updateOrCreate(
+                ['name' => $name],
+                ['description' => 'Jenis APD yang dinilai pada audit APD', 'is_active' => true]
+            );
+        }
+
+        // ==== APD Actions (item tindakan pada audit APD) ====
+        foreach (MasterData::APD_ACTIONS as $i => $name) {
+            ApdAction::updateOrCreate(
+                ['name' => $name],
+                ['order' => $i + 1, 'is_active' => true]
+            );
         }
 
         // ==== Waste Types ====
@@ -69,32 +64,13 @@ class MasterSeeder extends Seeder
         $categories = [
             [
                 'code' => 'cuci-tangan', 'name' => 'Audit Cuci Tangan', 'icon' => 'bi-droplet-half',
-                'description' => 'Audit kepatuhan kebersihan tangan (hand hygiene) sesuai 5 momen WHO.',
-                'questions' => [
-                    'Tersedia fasilitas cuci tangan (wastafel/ tempat cuci tangan)',
-                    'Air mengalir tersedia',
-                    'Sabun tersedia',
-                    'Handrub (alkohol based hand rub) tersedia',
-                    'Petugas melakukan kebersihan tangan sebelum tindakan / kontak pasien',
-                    'Petugas melakukan kebersihan tangan setelah tindakan / kontak pasien',
-                    'Teknik cuci tangan dilakukan sesuai prosedur (6 langkah)',
-                    'Petugas mengeringkan tangan dengan handuk sekali pakai / pengering',
-                    'Tidak ada perhiasan (cincin, gelang, jam) pada tangan petugas',
-                    'Kuku pendek dan bersih',
-                ],
+                'description' => 'Audit kepatuhan cuci tangan sesuai 5 Momen Kebersihan Tangan WHO.',
+                'questions' => MasterData::HAND_HYGIENE_QUESTIONS,
             ],
             [
                 'code' => 'apd', 'name' => 'Audit APD', 'icon' => 'bi-person-badge',
-                'description' => 'Audit penggunaan Alat Pelindung Diri (APD) sesuai jenis tindakan.',
-                'questions' => [
-                    'APD tersedia di unit',
-                    'APD sesuai dengan jenis tindakan',
-                    'APD digunakan sebelum tindakan',
-                    'APD digunakan dengan benar (sesuai prosedur pemakaian)',
-                    'APD dilepas sesuai prosedur',
-                    'APD sekali pakai tidak digunakan kembali',
-                    'APD dibuang pada tempat yang sesuai',
-                ],
+                'description' => 'Pilih tindakan yang diobservasi, lalu nilai penggunaan setiap jenis APD (Ya / Tidak).',
+                'questions' => MasterData::apdQuestions(),
             ],
             [
                 'code' => 'sampah', 'name' => 'Audit Pemilahan Sampah', 'icon' => 'bi-recycle',
@@ -143,10 +119,10 @@ class MasterSeeder extends Seeder
             ['name' => 'Admin PPI', 'email' => 'adminppi@ppicheck.test', 'role' => User::ROLE_ADMIN_PPI, 'unit_id' => null],
             ['name' => 'Andi Auditor', 'email' => 'auditor@ppicheck.test', 'role' => User::ROLE_AUDITOR, 'unit_id' => null],
             ['name' => 'Rina Auditor', 'email' => 'rina.auditor@ppicheck.test', 'role' => User::ROLE_AUDITOR, 'unit_id' => null],
-            ['name' => 'Kepala Unit IGD', 'email' => 'unit.igd@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => 'IGD'],
-            ['name' => 'Kepala Unit ICU', 'email' => 'unit.icu@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => 'ICU'],
-            ['name' => 'Kepala Rawat Inap', 'email' => 'unit.rin@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => 'RIN'],
-            ['name' => 'Kepala Poli Umum', 'email' => 'unit.pol@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => 'POL'],
+            ['name' => 'Kepala Unit IGD', 'email' => 'unit.igd@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => MasterData::unitCode('IGD P1')],
+            ['name' => 'Kepala Unit ICU', 'email' => 'unit.icu@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => MasterData::unitCode('ICU 1')],
+            ['name' => 'Kepala Rawat Inap', 'email' => 'unit.rin@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => MasterData::unitCode('TERATAI/GILI MOYO')],
+            ['name' => 'Kepala Poli Kandungan', 'email' => 'unit.pol@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => MasterData::unitCode('POLI KANDUNGAN')],
         ];
 
         $professionId = Profession::where('name', 'Perawat')->first()->id;

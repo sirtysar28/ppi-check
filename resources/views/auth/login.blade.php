@@ -19,7 +19,7 @@
         <div class="card-body p-4 p-md-5" x-data="{ showPassword: false }">
 
             <div class="text-center mb-4">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo PPI Check" class="login-logo mb-3">
+                <img src="{{ \App\Models\Setting::logoUrl() }}" alt="Logo PPI Check" class="login-logo mb-3">
                 <h1 class="h4 fw-bold mb-1">PPI Check</h1>
                 <p class="text-secondary small mb-0">Aplikasi Audit &amp; Surveilans<br>Pencegahan dan Pengendalian Infeksi</p>
             </div>

@@ -15,6 +15,12 @@
 
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-icons.min.css') }}">
+
+    {{-- Font Inter (footer & elemen kecil) --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
@@ -24,7 +30,7 @@
     {{-- ================= Sidebar ================= --}}
     <aside class="app-sidebar" :class="sidebarOpen && 'show'">
         <div class="brand">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo PPI Check">
+            <img src="{{ \App\Models\Setting::logoUrl() }}" alt="Logo PPI Check">
             <div>
                 <div class="title">PPI Check</div>
                 <div class="subtitle">Audit &amp; Surveilans PPI</div>
@@ -64,6 +70,9 @@
             <a href="{{ route('followups.index') }}" class="nav-link {{ request()->routeIs('followups.index') ? 'active' : '' }}">
                 <i class="bi bi-arrow-repeat"></i> Tindak Lanjut
             </a>
+            <a href="{{ route('monitoring-limbah-tajam.index') }}" class="nav-link {{ request()->routeIs('monitoring-limbah-tajam.*') ? 'active' : '' }}">
+                <i class="bi bi-eyedropper"></i> Monitoring Limbah Tajam
+            </a>
 
             <div class="nav-label">Laporan</div>
             <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
@@ -86,6 +95,9 @@
             <a href="{{ route('masters.apd-types.index') }}" class="nav-link {{ request()->routeIs('masters.apd-types.*') ? 'active' : '' }}">
                 <i class="bi bi-shield-check"></i> Jenis APD
             </a>
+            <a href="{{ route('masters.apd-actions.index') }}" class="nav-link {{ request()->routeIs('masters.apd-actions.*') ? 'active' : '' }}">
+                <i class="bi bi-activity"></i> Tindakan APD
+            </a>
             <a href="{{ route('masters.waste-types.index') }}" class="nav-link {{ request()->routeIs('masters.waste-types.*') ? 'active' : '' }}">
                 <i class="bi bi-trash3"></i> Jenis Limbah
             </a>
@@ -95,7 +107,7 @@
 
             <div class="nav-label">Pengaturan</div>
             <a href="{{ route('settings.index') }}" class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
-                <i class="bi bi-gear"></i> Parameter &amp; Profil
+                <i class="bi bi-gear"></i> Pengaturan Aplikasi
             </a>
             @endcan
         </nav>
@@ -124,6 +136,9 @@
             </div>
 
             <div class="ms-auto d-flex align-items-center gap-2">
+                {{-- Notifikasi --}}
+                @include('partials.notifications')
+
                 @can('conduct-audit')
                 <a href="{{ route('audits.create') }}" class="btn btn-brand btn-sm rounded-pill px-3">
                     <i class="bi bi-plus-lg me-1"></i><span class="d-none d-md-inline">Audit Baru</span><span class="d-md-none">Audit</span>
@@ -177,8 +192,16 @@
         </main>
 
         <footer class="app-footer no-print">
-            <span>&copy; <span data-year>{{ date('Y') }}</span> {{ config('app.name', 'PPI Check') }}</span>
-            <span>Powered by <a href="https://digimagine.web.id" target="_blank" rel="noopener"><b>Digimagine</b></a></span>
+            <div class="footer-left">
+                <span>&copy; <span data-year>{{ date('Y') }}</span> {{ config('app.name', 'PPI Check') }}</span>
+                <span class="footer-sep"></span>
+                <span>Aplikasi Audit &amp; Surveilans Pencegahan dan Pengendalian Infeksi (PPI)</span>
+            </div>
+            <div class="footer-right">
+                <span>{{ \App\Models\Setting::get('facility_name', config('app.name')) }}</span>
+                <span class="footer-sep"></span>
+                <span>Powered by <a href="https://digimagine.web.id" target="_blank" rel="noopener">Digimagine</a></span>
+            </div>
         </footer>
     </div>
 

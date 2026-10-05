@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApdAction;
 use App\Models\ApdType;
 use App\Models\Audit;
 use App\Models\AuditAnswer;
@@ -61,9 +62,10 @@ class AuditController extends Controller
         $professions = Profession::where('is_active', true)->get();
         $apdTypes = ApdType::where('is_active', true)->get();
         $wasteTypes = WasteType::where('is_active', true)->get();
+        $apdActions = ApdAction::where('is_active', true)->orderBy('order')->orderBy('name')->get();
 
         return view('audits.create', compact(
-            'category', 'categories', 'units', 'auditors', 'professions', 'apdTypes', 'wasteTypes'
+            'category', 'categories', 'units', 'auditors', 'professions', 'apdTypes', 'wasteTypes', 'apdActions'
         ));
     }
 
@@ -111,6 +113,11 @@ class AuditController extends Controller
             if (! isset($validated['answers'][$q->id])) {
                 return back()->withErrors(['answers' => 'Item #' . $q->order . ' belum dijawab.'])->withInput();
             }
+        }
+
+        // Tindakan wajib dipilih pada audit APD
+        if ($category->code === 'apd' && empty($validated['action_type'])) {
+            return back()->withErrors(['action_type' => 'Tindakan yang diobservasi wajib dipilih.'])->withInput();
         }
 
         DB::transaction(function () use ($validated, $questions, $category, $auditorId, $request, &$audit) {

@@ -30,7 +30,7 @@
 @endif
 <nav class="landing-navbar">
     <div class="container-lg d-flex align-items-center gap-2 py-2">
-        <img src="{{ asset('images/logo.png') }}" alt="Logo PPI Check" class="landing-nav-logo">
+        <img src="{{ \App\Models\Setting::logoUrl() }}" alt="Logo PPI Check" class="landing-nav-logo">
         <div class="lh-sm">
             <div class="fw-bold text-white">PPI Check</div>
             <div class="small" style="color:rgba(255,255,255,.6)">Audit &amp; Surveilans PPI</div>
@@ -92,7 +92,7 @@
                         <div class="mockup-notch"></div>
                         <div class="mockup-head">
                             <div class="d-flex align-items-center gap-2">
-                                <img src="{{ asset('images/logo.png') }}" alt="">
+                                <img src="{{ \App\Models\Setting::logoUrl() }}" alt="">
                                 <div class="lh-sm">
                                     <div class="text-white fw-bold small">Audit Cuci Tangan</div>
                                     <div class="tiny text-white-50">IGD &bull; Shift Pagi</div>
@@ -244,7 +244,7 @@
 <!-- =============== CTA =============== -->
 <section class="landing-cta">
     <div class="container-lg text-center">
-        <img src="{{ asset('images/logo.png') }}" alt="Logo PPI Check" class="cta-logo mb-3">
+        <img src="{{ \App\Models\Setting::logoUrl() }}" alt="Logo PPI Check" class="cta-logo mb-3">
         <h2 class="text-white fw-bold">Siap meningkatkan kepatuhan PPI?</h2>
         <p class="mb-4" style="color:rgba(255,255,255,.75)">Masuk sekarang dan mulai audit pertama Anda hari ini.</p>
         <a href="{{ route('login') }}" class="btn btn-light btn-lg rounded-pill fw-bold px-5">

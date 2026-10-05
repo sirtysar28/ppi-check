@@ -8,6 +8,7 @@ use App\Models\Finding;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -69,8 +70,9 @@ class DashboardController extends Controller
             ];
         })->values();
 
-        // Audit per unit (rata-rata kepatuhan)
-        $perUnit = Unit::where('is_active', true)
+        // Audit per unit (rata-rata kepatuhan) — dipaginasi agar kartu rapi
+        // dan sejajar dengan kartu di sebelahnya
+        $perUnitAll = Unit::where('is_active', true)
             ->when($user->role === User::ROLE_UNIT, fn ($q) => $q->where('id', $user->unit_id))
             ->withCount(['audits' => fn ($q) => $q->where('status', 'final')])
             ->get()
@@ -85,6 +87,18 @@ class DashboardController extends Controller
             })
             ->sortByDesc('avg')
             ->values();
+
+        $perPage = 10;
+        $lastPage = max(1, (int) ceil($perUnitAll->count() / $perPage));
+        $page = min(max(1, (int) $request->input('page', 1)), $lastPage);
+
+        $perUnit = (new LengthAwarePaginator(
+            $perUnitAll->forPage($page, $perPage)->values(),
+            $perUnitAll->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url()]
+        ))->withQueryString();
 
         // Temuan
         $findingsQuery = Finding::query()
