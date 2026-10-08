@@ -63,6 +63,11 @@ class Audit extends Model
         return $this->hasMany(AuditAnswer::class);
     }
 
+    public function observations()
+    {
+        return $this->hasMany(HandHygieneObservation::class)->orderBy('sequence');
+    }
+
     public function findings()
     {
         return $this->hasMany(Finding::class);

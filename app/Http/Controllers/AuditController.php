@@ -8,6 +8,7 @@ use App\Models\Audit;
 use App\Models\AuditAnswer;
 use App\Models\AuditCategory;
 use App\Models\Finding;
+use App\Models\HandHygieneObservation;
 use App\Models\Profession;
 use App\Models\Setting;
 use App\Models\Unit;
@@ -60,6 +61,12 @@ class AuditController extends Controller
         $units = Unit::where('is_active', true)->orderBy('name')->get();
         $auditors = User::where('role', 'auditor')->where('is_active', true)->orderBy('name')->get();
         $professions = Profession::where('is_active', true)->get();
+
+        // Lembar Audit Cuci Tangan punya form khusus (24 observasi: momen + tindakan)
+        if ($category->code === 'cuci-tangan') {
+            return view('audits.forms.cuci-tangan', compact('category', 'categories', 'units', 'auditors', 'professions'));
+        }
+
         $apdTypes = ApdType::where('is_active', true)->get();
         $wasteTypes = WasteType::where('is_active', true)->get();
         $apdActions = ApdAction::where('is_active', true)->orderBy('order')->orderBy('name')->get();
@@ -72,6 +79,12 @@ class AuditController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
+
+        // Form khusus: Lembar Audit Cuci Tangan (24 observasi momen + tindakan)
+        $category = AuditCategory::find($request->input('category_id'));
+        if ($category?->code === 'cuci-tangan') {
+            return $this->storeHandHygiene($request, $category, $user);
+        }
 
         $validated = $request->validate([
             'category_id' => ['required', 'exists:audit_categories,id'],
@@ -211,11 +224,118 @@ class AuditController extends Controller
             ->with('success', 'Audit berhasil disimpan. Skor kepatuhan dihitung otomatis: ' . $audit->compliance_percentage . '%.');
     }
 
+    /**
+     * Simpan Lembar Audit Cuci Tangan sesuai format Word:
+     * header (observer, ruang, bulan/tanggal) + maks 24 observasi,
+     * tiap observasi = momen (5 Momen WHO) + tindakan (HR/HW/Tidak/Set lepas sarung tangan).
+     * Kepatuhan = tindakan patuh / seluruh observasi terisi x 100%.
+     */
+    private function storeHandHygiene(Request $request, AuditCategory $category, User $user)
+    {
+        $validated = $request->validate([
+            'unit_id' => ['required', 'exists:units,id'],
+            'auditor_id' => ['required', 'exists:users,id'],
+            'audit_date' => ['required', 'date'],
+            'shift' => ['required', 'in:pagi,siang,malam'],
+            'officer_name' => ['nullable', 'string', 'max:150'],
+            'profession_id' => ['nullable', 'exists:professions,id'],
+            'notes' => ['nullable', 'string'],
+            'observations' => ['nullable', 'array', 'max:24'],
+            'observations.*.moment' => ['nullable', 'string', 'in:' . implode(',', array_keys(HandHygieneObservation::MOMENTS))],
+            'observations.*.action' => ['nullable', 'string', 'in:' . implode(',', array_keys(HandHygieneObservation::ACTIONS))],
+        ], [
+            'observations.*.moment.in' => 'Momen observasi tidak valid.',
+            'observations.*.action.in' => 'Tindakan observasi tidak valid.',
+        ]);
+
+        // Kumpulkan baris yang terisi; momen & tindakan wajib berpasangan
+        $rows = [];
+        foreach ((array) ($validated['observations'] ?? []) as $seq => $row) {
+            $moment = $row['moment'] ?? null;
+            $action = $row['action'] ?? null;
+
+            if ($moment === null && $action === null) {
+                continue; // baris kosong (peluang tidak terpakai)
+            }
+
+            if ($moment === null || $action === null) {
+                return back()
+                    ->withErrors(['observations' => "Observasi #{$seq}: Momen dan Tindakan wajib diisi keduanya."])
+                    ->withInput();
+            }
+
+            $rows[(int) $seq] = ['moment' => $moment, 'action' => $action];
+        }
+
+        if (empty($rows)) {
+            return back()->withErrors(['observations' => 'Minimal 1 observasi harus diisi.'])->withInput();
+        }
+
+        // Hanya admin/auditor yang boleh memilih auditor lain; auditor default dirinya
+        $auditorId = $user->role === User::ROLE_AUDITOR ? $user->id : $validated['auditor_id'];
+
+        $conform = 0;
+        foreach ($rows as $row) {
+            if (in_array($row['action'], HandHygieneObservation::COMPLIANT_ACTIONS, true)) {
+                $conform++;
+            }
+        }
+        $nonConform = count($rows) - $conform;
+        $compliance = \App\Support\Ppi::compliance($conform, count($rows));
+
+        $audit = null;
+        DB::transaction(function () use ($validated, $rows, $category, $auditorId, $conform, $nonConform, $compliance, &$audit) {
+            $audit = Audit::create([
+                'audit_number' => $this->nextAuditNumber(),
+                'category_id' => $category->id,
+                'unit_id' => $validated['unit_id'],
+                'auditor_id' => $auditorId,
+                'audit_date' => $validated['audit_date'],
+                'shift' => $validated['shift'],
+                'officer_name' => $validated['officer_name'] ?? null,
+                'profession_id' => $validated['profession_id'] ?? null,
+                'total_items' => count($rows),
+                'conform_items' => $conform,
+                'nonconform_items' => $nonConform,
+                'na_items' => 0,
+                'compliance_percentage' => $compliance,
+                'grade' => Setting::grade($compliance),
+                'status' => 'final',
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            foreach ($rows as $seq => $row) {
+                HandHygieneObservation::create([
+                    'audit_id' => $audit->id,
+                    'sequence' => $seq,
+                    'moment' => $row['moment'],
+                    'action' => $row['action'],
+                ]);
+            }
+        });
+
+        return redirect()->route('audits.show', $audit)
+            ->with('success', 'Audit Cuci Tangan berhasil disimpan. Kepatuhan: ' . $compliance . '% (' . $conform . ' patuh dari ' . count($rows) . ' observasi).');
+    }
+
+    /** Nomor audit berurutan per tahun: PPI-YYYY-0001. */
+    private function nextAuditNumber(): string
+    {
+        $year = now()->year;
+        $seq = (int) Audit::where('audit_number', 'like', "PPI-{$year}-%")->count() + 1;
+        do {
+            $number = sprintf('PPI-%d-%04d', $year, $seq);
+            $seq++;
+        } while (Audit::where('audit_number', $number)->exists());
+
+        return $number;
+    }
+
     public function show(Request $request, Audit $audit): View
     {
         $this->authorize('view-audit', $audit);
 
-        $audit->load(['unit', 'category', 'auditor', 'profession', 'apdType', 'wasteType', 'answers.question', 'findings.followUps.user', 'findings.verifications.verifier']);
+        $audit->load(['unit', 'category', 'auditor', 'profession', 'apdType', 'wasteType', 'answers.question', 'observations', 'findings.followUps.user', 'findings.verifications.verifier']);
 
         return view('audits.show', compact('audit'));
     }
@@ -224,7 +344,7 @@ class AuditController extends Controller
     {
         $this->authorize('view-audit', $audit);
 
-        $audit->load(['unit', 'category', 'auditor', 'profession', 'apdType', 'wasteType', 'answers.question', 'findings']);
+        $audit->load(['unit', 'category', 'auditor', 'profession', 'apdType', 'wasteType', 'answers.question', 'observations', 'findings']);
 
         $pdf = Pdf::loadView('audits.pdf', [
             'audit' => $audit,

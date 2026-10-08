@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/unit/{unit}', [DashboardController::class, 'unitDetail'])->name('dashboard.unit');
 
-    // Audit PPI (Cuci Tangan, APD, Pemilahan Sampah)
+    // Audit PPI (Cuci Tangan, APD, Penanganan Limbah Benda Tajam)
     Route::get('/audits', [AuditController::class, 'index'])->name('audits.index');
     Route::get('/audits/create', [AuditController::class, 'create'])->name('audits.create');
     Route::post('/audits', [AuditController::class, 'store'])->name('audits.store');

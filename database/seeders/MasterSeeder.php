@@ -73,18 +73,18 @@ class MasterSeeder extends Seeder
                 'questions' => MasterData::apdQuestions(),
             ],
             [
-                'code' => 'sampah', 'name' => 'Audit Pemilahan Sampah', 'icon' => 'bi-recycle',
-                'description' => 'Audit pemilahan dan pengelolaan limbah medis dan non medis.',
+                'code' => 'sampah', 'name' => 'Audit Penanganan Limbah Benda Tajam', 'icon' => 'bi-recycle',
+                'description' => 'Lembar monitoring penanganan limbah benda tajam (no recapping, safety box, dll.) — beri tanda (✓) pada kolom Ya / Tidak.',
+                // Item sesuai formulir: LEMBAR PENANGANAN LIMBAH BENDA TAJAM (Update 8 Okt 2026)
                 'questions' => [
-                    'Tempat sampah tersedia di setiap area',
-                    'Label tempat sampah tersedia dan terbaca',
-                    'Warna tempat sampah sesuai jenis limbah',
-                    'Sampah dipilah sesuai jenisnya',
-                    'Safety box tersedia',
-                    'Benda tajam dimasukkan ke safety box',
-                    'Sampah tidak tercampur antar jenis',
-                    'Tempat sampah ditutup dan tidak melebihi kapasitas 3/4',
-                    'Sampah medis diangkut sesuai jadwal dengan alat khusus',
+                    'Jarum suntik bekas pakai tidak ditutup kembali (no recapping)',
+                    'Benda tajam bekas pakai tidak diberikan secara langsung kepada orang lain (tidak hand-to-hand)',
+                    'Jika harus memberikan benda tajam ke orang lain gunakan container',
+                    'Limbah benda tajam dibuang ke dalam safety box (tahan tusuk dan tahan bocor)',
+                    'Safety box ditutup rapat atau disegel saat telah terisi maksimal 3/4 dan dibuang ke tempat penyimpanan sementara limbah medis',
+                    'Tidak dilakukan pembengkokan (bending) atau pematahan jarum',
+                    'Jarum tidak dilepas dari spuit secara manual',
+                    'Safety box tersedia di setiap titik pelayanan',
                 ],
             ],
         ];
@@ -106,6 +106,9 @@ class MasterSeeder extends Seeder
                     ['weight' => 1, 'order' => $i + 1, 'is_active' => true]
                 );
             }
+
+            // Nonaktifkan pertanyaan lama yang sudah tidak dipakai (mis. formulir berubah)
+            $category->questions()->whereNotIn('question', $cat['questions'])->update(['is_active' => false]);
         }
 
         // ==== Settings ====
@@ -119,6 +122,11 @@ class MasterSeeder extends Seeder
             ['name' => 'Admin PPI', 'email' => 'adminppi@ppicheck.test', 'role' => User::ROLE_ADMIN_PPI, 'unit_id' => null],
             ['name' => 'Andi Auditor', 'email' => 'auditor@ppicheck.test', 'role' => User::ROLE_AUDITOR, 'unit_id' => null],
             ['name' => 'Rina Auditor', 'email' => 'rina.auditor@ppicheck.test', 'role' => User::ROLE_AUDITOR, 'unit_id' => null],
+            ['name' => 'I Ketut Parindra', 'email' => 'ketut.parindra@ppicheck.test', 'role' => User::ROLE_AUDITOR, 'unit_id' => null],
+            ['name' => 'Irham Suhaedi', 'email' => 'irham.suhaedi@ppicheck.test', 'role' => User::ROLE_AUDITOR, 'unit_id' => null],
+            ['name' => 'Ida Ayu Wayan D', 'email' => 'ida.ayu@ppicheck.test', 'role' => User::ROLE_AUDITOR, 'unit_id' => null],
+            ['name' => 'Nining Wahyuni', 'email' => 'nining.wahyuni@ppicheck.test', 'role' => User::ROLE_AUDITOR, 'unit_id' => null],
+            ['name' => 'Sang Ayu Made K', 'email' => 'sang.ayu@ppicheck.test', 'role' => User::ROLE_AUDITOR, 'unit_id' => null],
             ['name' => 'Kepala Unit IGD', 'email' => 'unit.igd@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => MasterData::unitCode('IGD P1')],
             ['name' => 'Kepala Unit ICU', 'email' => 'unit.icu@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => MasterData::unitCode('ICU 1')],
             ['name' => 'Kepala Rawat Inap', 'email' => 'unit.rin@ppicheck.test', 'role' => User::ROLE_UNIT, 'unit_code' => MasterData::unitCode('TERATAI/GILI MOYO')],

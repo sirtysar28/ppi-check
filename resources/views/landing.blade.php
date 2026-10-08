@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0a5c4d">
-    <meta name="description" content="PPI Check — Aplikasi Audit & Surveilans Pencegahan dan Pengendalian Infeksi. Audit cuci tangan, APD, dan pemilahan sampah dalam satu aplikasi.">
+    <meta name="description" content="PPI Check — Aplikasi Audit & Surveilans Pencegahan dan Pengendalian Infeksi. Audit cuci tangan, APD, dan penanganan limbah benda tajam dalam satu aplikasi.">
 
     <title>PPI Check | Audit &amp; Surveilans Pencegahan dan Pengendalian Infeksi</title>
 
@@ -52,7 +52,7 @@
                 </h1>
                 <p class="hero-subtitle mx-auto mx-lg-0">
                     PPI Check memudahkan tim PPI melakukan <b>audit kepatuhan</b> cuci tangan, pemakaian APD,
-                    dan pemilahan sampah — lengkap dari <b>monitoring temuan</b> sampai <b>tindak lanjut terverifikasi</b>.
+                    dan penanganan limbah benda tajam — lengkap dari <b>monitoring temuan</b> sampai <b>tindak lanjut terverifikasi</b>.
                 </p>
                 <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center justify-content-lg-start mt-4">
                     <a href="{{ route('login') }}" class="btn btn-warning fw-bold rounded-pill px-4 py-2">
@@ -151,8 +151,8 @@
             <div class="col-12 col-sm-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon" style="background:#fef3c7;color:#b45309"><i class="bi bi-recycle"></i></div>
-                    <h3>Audit Pemilahan Sampah</h3>
-                    <p>Pemilahan limbah medis &amp; non-medis, safety box, hingga jadwal pengangkutan.</p>
+                    <h3>Audit Penanganan Limbah Benda Tajam</h3>
+                    <p>Ketersediaan safety box, pembuangan benda tajam yang aman, hingga pemantauan pengangkutan.</p>
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-lg-4">

@@ -7,7 +7,7 @@
 <div class="row justify-content-center">
     <div class="col-12 col-xl-10">
 
-        {{-- Pilih kategori (Cuci Tangan / APD / Pemilahan Sampah) --}}
+        {{-- Pilih kategori (Cuci Tangan / APD / Penanganan Limbah Benda Tajam) --}}
         <div class="card mb-3 no-print">
             <div class="card-body">
                 <div class="row g-2">
@@ -19,7 +19,9 @@
                                 <div class="stat-icon bg-brand-light text-brand"><i class="bi {{ $cat->icon }} fs-4"></i></div>
                                 <div>
                                     <div class="fw-bold {{ $cat->id === $category->id ? 'text-brand' : 'text-dark' }}">{{ $cat->name }}</div>
-                                    <div class="small text-secondary">{{ $cat->activeQuestions()->count() }} item pemeriksaan</div>
+                                    <div class="small text-secondary">
+                                        {{ $cat->code === 'cuci-tangan' ? 'Form observasi (maks. 24 peluang)' : $cat->activeQuestions()->count() . ' item pemeriksaan' }}
+                                    </div>
                                 </div>
                                 @if($cat->id === $category->id)
                                     <i class="bi bi-check-circle-fill text-brand ms-auto"></i>

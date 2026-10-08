@@ -51,6 +51,8 @@
         @endif
     </table>
 
+@php($isHandHygiene = $audit->category->code === 'cuci-tangan' && $audit->observations->isNotEmpty())
+@php($HH = \App\Models\HandHygieneObservation::class)
     <div class="score-box">
         <div class="value">{{ $audit->compliance_percentage }}%</div>
         <div>Nilai Kepatuhan — {{ $audit->grade }}</div>
@@ -58,9 +60,9 @@
 
     <table style="margin-top:14px">
         <tr>
-            <th class="center">Total Item</th>
-            <th class="center">Sesuai</th>
-            <th class="center">Tidak Sesuai</th>
+            <th class="center">Total Observasi</th>
+            <th class="center">{{ $isHandHygiene ? 'Patuh' : 'Sesuai' }}</th>
+            <th class="center">{{ $isHandHygiene ? 'Tidak Patuh' : 'Tidak Sesuai' }}</th>
             <th class="center">N/A</th>
             <th class="center">Temuan</th>
         </tr>
@@ -73,7 +75,42 @@
         </tr>
     </table>
 
-    <h4>Checklist Penilaian</h4>
+    <h4>{{ $isHandHygiene ? 'Detail Observasi Cuci Tangan' : 'Checklist Penilaian' }}</h4>
+    @if($isHandHygiene)
+    <table>
+        <tr>
+            <th class="center" style="width:34px">No</th>
+            <th>Momen (5 Momen WHO)</th>
+            <th style="width:26%">Tindakan</th>
+            <th class="center" style="width:80px">Status</th>
+        </tr>
+        @foreach($audit->observations as $obs)
+        <tr>
+            <td class="center">{{ $obs->sequence }}</td>
+            <td>{{ $obs->moment_label }}</td>
+            <td>{{ $obs->action_label }}</td>
+            <td class="center">
+                @if($obs->is_compliant)<span class="badge-ok">✓ Patuh</span>
+                @else<span class="badge-no">✗ Tidak</span>@endif
+            </td>
+        </tr>
+        @endforeach
+    </table>
+    <table style="margin-top:8px">
+        <tr>
+            @foreach($HH::ACTIONS as $aKey => $aLabel)
+            <th class="center">{{ $aLabel }}</th>
+            @endforeach
+            <th class="center">Kepatuhan</th>
+        </tr>
+        <tr class="center">
+            @foreach($HH::ACTIONS as $aKey => $aLabel)
+            <td>{{ $audit->observations->where('action', $aKey)->count() }}</td>
+            @endforeach
+            <td><b>{{ $audit->compliance_percentage }}%</b></td>
+        </tr>
+    </table>
+    @else
     <table>
         <tr>
             <th style="width:34px" class="center">No</th>
@@ -92,6 +129,7 @@
         </tr>
         @endforeach
     </table>
+    @endif
 
     <h4>Temuan</h4>
     @forelse($audit->findings as $finding)

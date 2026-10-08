@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@php($isHandHygiene = $audit->category->code === 'cuci-tangan' && $audit->observations->isNotEmpty())
+
 @section('title', 'Hasil Audit ' . $audit->audit_number)
 @section('page_title', 'Hasil Audit')
 
@@ -43,11 +45,11 @@
                     </div>
                     <div class="col-3 col-md-2">
                         <div class="fw-bold fs-5 text-success">{{ $audit->conform_items }}</div>
-                        <div class="text-secondary">Sesuai</div>
+                        <div class="text-secondary">{{ $isHandHygiene ? 'Patuh' : 'Sesuai' }}</div>
                     </div>
                     <div class="col-3 col-md-2">
                         <div class="fw-bold fs-5 text-danger">{{ $audit->nonconform_items }}</div>
-                        <div class="text-secondary">Tidak Sesuai</div>
+                        <div class="text-secondary">{{ $isHandHygiene ? 'Tidak Patuh' : 'Tidak Sesuai' }}</div>
                     </div>
                     <div class="col-3 col-md-2">
                         <div class="fw-bold fs-5 text-secondary">{{ $audit->na_items }}</div>
@@ -109,13 +111,52 @@
             </div>
         </div>
 
-        {{-- Checklist detail --}}
+        {{-- Checklist / Observasi detail --}}
         <div class="card mb-4">
             <div class="card-header bg-white fw-semibold" style="border-radius:1rem 1rem 0 0">
-                <i class="bi bi-list-check me-2 text-brand"></i>Detail Checklist
+                <i class="bi {{ $isHandHygiene ? 'bi-eyeglasses' : 'bi-list-check' }} me-2 text-brand"></i>
+                {{ $isHandHygiene ? 'Detail Observasi Cuci Tangan' : 'Detail Checklist' }}
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
+                @if($isHandHygiene)
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="small">
+                                    <th class="ps-3" style="width:56px">No</th>
+                                    <th>Momen (5 Momen WHO)</th>
+                                    <th style="width:24%">Tindakan</th>
+                                    <th class="text-center pe-3" style="width:120px">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($audit->observations as $obs)
+                                    <tr>
+                                        <td class="ps-3 text-secondary">{{ $obs->sequence }}</td>
+                                        <td>{{ $obs->moment_label }}</td>
+                                        <td>{{ $obs->action_label }}</td>
+                                        <td class="text-center pe-3">
+                                            @if($obs->is_compliant)
+                                                <span class="badge badge-rounded bg-success-subtle text-success"><i class="bi bi-check-lg"></i> Patuh</span>
+                                            @else
+                                                <span class="badge badge-rounded bg-danger-subtle text-danger"><i class="bi bi-x-lg"></i> Tidak Patuh</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 border-top small">
+                        <b class="text-secondary">Rekap tindakan:</b>
+                        @foreach(\App\Models\HandHygieneObservation::ACTIONS as $aKey => $aLabel)
+                            <span class="badge badge-rounded bg-light border text-dark ms-1">
+                                {{ $aLabel }}: <b>{{ $audit->observations->where('action', $aKey)->count() }}</b>
+                            </span>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr class="small">
@@ -143,6 +184,7 @@
                         </tbody>
                     </table>
                 </div>
+                @endif
             </div>
         </div>
 

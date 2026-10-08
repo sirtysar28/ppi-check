@@ -33,7 +33,7 @@ class UpdateOkt2026Test extends TestCase
         $pages = [
             '/dashboard' => 'PPI Check',
             '/audits/create?category=apd' => 'Tindakan yang Diobservasi',
-            '/audits/create?category=cuci-tangan' => 'sebelum kontak dengan pasien',
+            '/audits/create?category=cuci-tangan' => 'Observasi Peluang Cuci Tangan',
             '/monitoring-limbah-tajam' => 'Lembar Monitoring Penanganan Limbah Benda Tajam',
             '/monitoring-limbah-tajam/riwayat' => 'Data Monitoring',
             '/settings' => 'Konfigurasi SMTP',
