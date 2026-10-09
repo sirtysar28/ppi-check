@@ -21,6 +21,7 @@
 | 👤 **Profil** | Pembaruan data profil & kata sandi pengguna |
 | 🔐 **Keamanan** | Login dengan **captcha SVG**, rate-limiting percobaan login, middleware peran & status aktif user, activity log |
 | 📱 **PWA Ready** | Service worker, manifest & halaman offline — dapat dipasang seperti aplikasi mobile |
+| 📖 **Buku Manual** | Panduan pengguna (HTML) yang otomatis menyesuaikan peran: Admin (lengkap semua fitur), Auditor, dan Unit/Petugas — dapat dicetak/disimpan PDF |
 
 ## 👥 Peran Pengguna (Role)
 
@@ -29,7 +30,7 @@
 | **Super Admin** | Akses penuh: semua modul, kelola user, master data & pengaturan |
 | **Admin PPI** | Kelola audit, verifikasi, laporan, master data & pengaturan |
 | **Auditor** | Melaksanakan audit, melihat temuan, verifikasi tindak lanjut, laporan |
-| **Unit / Petugas** | Melihat temuan unit, mengirim tindak lanjut |
+| **Unit / Petugas** | Audit mandiri Cuci Tangan & APD (unit sendiri), melihat temuan unit, mengirim tindak lanjut, monitoring limbah tajam, laporan unit |
 
 > ℹ️ Kredensial akun tidak dipublikasikan. Silakan hubungi **Super Admin / Admin PPI** masing-masing fasilitas untuk pembuatan akun.
 

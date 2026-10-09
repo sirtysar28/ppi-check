@@ -59,7 +59,7 @@
                         </div>
                         <div class="col-6 col-md-4">
                             <label class="form-label small fw-semibold">Auditor <span class="text-danger">*</span></label>
-                            @if(auth()->user()->role === \App\Models\User::ROLE_AUDITOR)
+                            @if(in_array(auth()->user()->role, [\App\Models\User::ROLE_AUDITOR, \App\Models\User::ROLE_UNIT]))
                                 <input type="text" class="form-control" value="{{ auth()->user()->name }}" disabled>
                                 <input type="hidden" name="auditor_id" value="{{ auth()->user()->id }}">
                             @else
@@ -73,12 +73,17 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <label class="form-label small fw-semibold">Unit / Ruangan <span class="text-danger">*</span></label>
-                            <select name="unit_id" class="form-select" required x-model="unitId">
-                                <option value="">-- Pilih Unit --</option>
-                                @foreach($units as $unit)
-                                    <option value="{{ $unit->id }}" {{ (string)old('unit_id') === (string)$unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
-                                @endforeach
-                            </select>
+                            @if(auth()->user()->role === \App\Models\User::ROLE_UNIT)
+                                <input type="text" class="form-control" value="{{ auth()->user()->unit?->name ?? '-' }}" disabled>
+                                <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
+                            @else
+                                <select name="unit_id" class="form-select" required x-model="unitId">
+                                    <option value="">-- Pilih Unit --</option>
+                                    @foreach($units as $unit)
+                                        <option value="{{ $unit->id }}" {{ (string)old('unit_id') === (string)$unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
                         </div>
                         <div class="col-12 col-md-4">
                             <label class="form-label small fw-semibold">Nama Petugas yang Diaudit</label>

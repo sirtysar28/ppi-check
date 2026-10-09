@@ -21,6 +21,9 @@ use Illuminate\View\View;
 
 class AuditController extends Controller
 {
+    /** Kategori audit yang boleh dilaksanakan sendiri oleh role Unit (audit mandiri). */
+    public const UNIT_ALLOWED_CATEGORIES = ['cuci-tangan', 'apd'];
+
     public function index(Request $request): View
     {
         $user = $request->user();
@@ -54,11 +57,22 @@ class AuditController extends Controller
 
     public function create(Request $request): View
     {
+        $user = $request->user();
         $categoryCode = $request->input('category', 'cuci-tangan');
         $category = AuditCategory::where('code', $categoryCode)->where('is_active', true)->firstOrFail();
 
-        $categories = AuditCategory::where('is_active', true)->get();
+        // Role Unit hanya boleh audit mandiri Cuci Tangan & APD untuk unitnya sendiri
+        if ($user->role === User::ROLE_UNIT && ! in_array($category->code, self::UNIT_ALLOWED_CATEGORIES, true)) {
+            abort(403, 'Unit hanya dapat melaksanakan Audit Cuci Tangan dan Audit APD.');
+        }
+
+        $categories = AuditCategory::where('is_active', true)
+            ->when($user->role === User::ROLE_UNIT, fn ($q) => $q->whereIn('code', self::UNIT_ALLOWED_CATEGORIES))
+            ->get();
         $units = Unit::where('is_active', true)->orderBy('name')->get();
+        if ($user->role === User::ROLE_UNIT) {
+            $units = Unit::whereKey($user->unit_id)->get();
+        }
         $auditors = User::where('role', 'auditor')->where('is_active', true)->orderBy('name')->get();
         $professions = Profession::where('is_active', true)->get();
 
@@ -112,13 +126,24 @@ class AuditController extends Controller
             'answers.*.required' => 'Semua item checklist wajib dipilih (Ya / Tidak / N/A).',
         ]);
 
-        // Hanya admin/auditor yang boleh memilih auditor lain; auditor default dirinya
+        // Hanya admin/auditor yang boleh memilih auditor lain; auditor & unit (audit mandiri) default dirinya
         $auditorId = $validated['auditor_id'];
-        if ($user->role === User::ROLE_AUDITOR) {
+        if (in_array($user->role, [User::ROLE_AUDITOR, User::ROLE_UNIT], true)) {
             $auditorId = $user->id;
         }
 
+        // Role Unit wajib audit untuk unitnya sendiri
+        if ($user->role === User::ROLE_UNIT) {
+            $validated['unit_id'] = $user->unit_id;
+        }
+
         $category = AuditCategory::findOrFail($validated['category_id']);
+
+        // Role Unit hanya boleh audit mandiri kategori tertentu
+        if ($user->role === User::ROLE_UNIT && ! in_array($category->code, self::UNIT_ALLOWED_CATEGORIES, true)) {
+            abort(403, 'Unit hanya dapat melaksanakan Audit Cuci Tangan dan Audit APD.');
+        }
+
         $questions = $category->activeQuestions;
 
         // Pastikan semua pertanyaan terjawab
@@ -271,8 +296,13 @@ class AuditController extends Controller
             return back()->withErrors(['observations' => 'Minimal 1 observasi harus diisi.'])->withInput();
         }
 
-        // Hanya admin/auditor yang boleh memilih auditor lain; auditor default dirinya
-        $auditorId = $user->role === User::ROLE_AUDITOR ? $user->id : $validated['auditor_id'];
+        // Hanya admin/auditor yang boleh memilih auditor lain; auditor & unit (audit mandiri) default dirinya
+        $auditorId = in_array($user->role, [User::ROLE_AUDITOR, User::ROLE_UNIT], true) ? $user->id : $validated['auditor_id'];
+
+        // Role Unit wajib observasi untuk unitnya sendiri
+        if ($user->role === User::ROLE_UNIT) {
+            $validated['unit_id'] = $user->unit_id;
+        }
 
         $conform = 0;
         foreach ($rows as $row) {

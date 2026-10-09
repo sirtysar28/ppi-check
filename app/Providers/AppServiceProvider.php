@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-users', fn (User $user) => $user->hasRole(User::ROLE_SUPER_ADMIN));
         Gate::define('manage-instruments', fn (User $user) => $user->hasRole([User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN_PPI]));
         Gate::define('view-all-reports', fn (User $user) => $user->hasRole([User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN_PPI]));
-        Gate::define('conduct-audit', fn (User $user) => $user->hasRole([User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN_PPI, User::ROLE_AUDITOR]));
+        Gate::define('conduct-audit', fn (User $user) => $user->hasRole([User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN_PPI, User::ROLE_AUDITOR, User::ROLE_UNIT]));
         Gate::define('verify-followup', fn (User $user) => $user->hasRole([User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN_PPI, User::ROLE_AUDITOR]));
 
         Gate::define('view-audit', fn (User $user, Audit $audit) => $user->hasRole([User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN_PPI, User::ROLE_AUDITOR]) || $audit->unit_id === $user->unit_id);

@@ -6,6 +6,7 @@ use App\Http\Controllers\AuditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FindingController;
 use App\Http\Controllers\FollowUpController;
+use App\Http\Controllers\ManualBookController;
 use App\Http\Controllers\MonitoringLimbahTajamController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -123,6 +124,9 @@ Route::middleware('auth')->group(function () {
 
     // Ganti password (semua role)
     Route::put('/settings/password', [SettingController::class, 'updatePassword'])->name('settings.password.update');
+
+    // Buku Manual / Panduan Pengguna (semua role — isi menyesuaikan peran masing-masing)
+    Route::get('/manual-book', ManualBookController::class)->name('manual-book');
 });
 
 // Offline page (PWA)

@@ -48,7 +48,10 @@
 
             @can('conduct-audit')
             <div class="nav-label">Audit PPI</div>
-            @foreach(\App\Models\AuditCategory::where('is_active', true)->get() as $cat)
+            @php($sidebarCategories = \App\Models\AuditCategory::where('is_active', true)
+                ->when(auth()->user()->role === \App\Models\User::ROLE_UNIT, fn ($q) => $q->whereIn('code', \App\Http\Controllers\AuditController::UNIT_ALLOWED_CATEGORIES))
+                ->get())
+            @foreach($sidebarCategories as $cat)
                 <a href="{{ route('audits.create', ['category' => $cat->code]) }}"
                    class="nav-link {{ request()->routeIs('audits.create') && request('category') === $cat->code ? 'active' : '' }}">
                     <i class="bi {{ $cat->icon }}"></i> {{ $cat->name }}
@@ -77,6 +80,11 @@
             <div class="nav-label">Laporan</div>
             <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                 <i class="bi bi-file-earmark-bar-graph"></i> Laporan &amp; Rekap
+            </a>
+
+            <div class="nav-label">Bantuan</div>
+            <a href="{{ route('manual-book') }}" class="nav-link {{ request()->routeIs('manual-book') ? 'active' : '' }}">
+                <i class="bi bi-journal-text"></i> Buku Manual
             </a>
 
             @can('manage-masters')
@@ -118,9 +126,7 @@
         </div>
     </aside>
 
-    @if(auth()->user()->role !== \App\Models\User::ROLE_UNIT)
     <div class="offcanvas-backdrop fade show d-lg-none" x-show="sidebarOpen" x-cloak style="background:rgba(0,0,0,.45)" @click="sidebarOpen=false"></div>
-    @endif
 
     {{-- ================= Main ================= --}}
     <div class="app-main">

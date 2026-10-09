@@ -46,6 +46,14 @@
                 <label class="form-label small mb-1 text-secondary">Sampai</label>
                 <input type="date" name="end" class="form-control form-control-sm" value="{{ request('end') }}">
             </div>
+            @if(auth()->user()->role === \App\Models\User::ROLE_AUDITOR)
+                <div class="col-12 col-md-4 col-lg-2">
+                    <div class="form-check mb-1">
+                        <input class="form-check-input" type="checkbox" name="mine" id="mine" value="1" {{ request('mine') === '1' ? 'checked' : '' }}>
+                        <label class="form-check-label small" for="mine">Milik Saya</label>
+                    </div>
+                </div>
+            @endif
             <div class="col-12 col-md-2 col-lg-1 d-grid">
                 <button class="btn btn-brand btn-sm"><i class="bi bi-funnel"></i> Filter</button>
             </div>
